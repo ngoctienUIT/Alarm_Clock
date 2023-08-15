@@ -3,6 +3,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
+    id("kotlin-parcelize")
     id("kotlin-kapt")
 }
 
@@ -83,6 +84,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.5.0")
     implementation("androidx.navigation:navigation-compose:2.7.0")
     implementation("androidx.paging:paging-compose:3.2.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     //Room
     implementation("androidx.room:room-runtime:2.5.2")

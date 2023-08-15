@@ -27,22 +27,33 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.tnt.alarmclock.R
+import com.tnt.alarmclock.core.utils.NavDestinations
 import com.tnt.alarmclock.ui.theme.AlarmClockTheme
-import com.tnt.alarmclock.utils.listWeekday
+import com.tnt.alarmclock.core.utils.listWeekday
+import com.tnt.alarmclock.data.local.entity.AlarmEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlarmScreen() {
+fun AlarmScreen(navController: NavController, viewModel: AlarmViewModel = hiltViewModel()) {
+    val listAlarm by viewModel.listAlarm.collectAsState()
+    val context = LocalContext.current
+
     Scaffold(
         containerColor = Color(0xFF1D1D23),
         topBar = {
@@ -69,17 +80,22 @@ fun AlarmScreen() {
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(10) { index ->
+            items(listAlarm.size) { index ->
                 ItemAlarm(
-                    title = "Work",
-                    time = "8:30",
-                    check = index % 2 == 0,
-                    is24h = false,
-                    isAM = true,
-                    isOn = index % 2 == 0,
-                    weekDay = listOf(index % 2 == 0, true, true, true, true, true, true)
+                    alarm = listAlarm[index],
+                    is24h = true,
+                    isPaddingEnd = index % 2 == 0,
+                    onChange = { switch ->
+                        viewModel.changeSwitch(listAlarm[index].id, switch, context)
+                    }
                 ) {
-
+                    navController.navigate("${NavDestinations.ADD_ALARM_SCREEN}/${listAlarm[index].toAlarm()}") {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) { saveState = true }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             }
         }
@@ -88,37 +104,38 @@ fun AlarmScreen() {
 
 @Composable
 fun ItemAlarm(
-    title: String,
-    time: String,
-    check: Boolean,
-    is24h: Boolean = false,
-    isAM: Boolean = true,
-    isOn: Boolean,
-    weekDay: List<Boolean>,
-    onChange: (state: Boolean) -> Unit
+    alarm: AlarmEntity,
+    is24h: Boolean = true,
+    isPaddingEnd: Boolean,
+    onChange: (state: Boolean) -> Unit,
+    onClick: () -> Unit
 ) {
     Card(
-        modifier = if (check) Modifier.padding(end = 8.dp, bottom = 16.dp)
-        else Modifier.padding(start = 8.dp, bottom = 16.dp),
+        modifier = if (isPaddingEnd) Modifier
+            .padding(end = 8.dp, bottom = 16.dp)
+            .clickable { onClick() }
+        else Modifier
+            .padding(start = 8.dp, bottom = 16.dp)
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color(0xFF34344A)),
         elevation = CardDefaults.elevatedCardElevation(3.dp),
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(modifier = Modifier.padding(vertical = 20.dp, horizontal = 30.dp)) {
-            Text(text = title, fontSize = 14.sp, color = Color.White)
+            Text(text = alarm.title, fontSize = 14.sp, color = Color.White)
             Row(verticalAlignment = Alignment.Bottom) {
-                Text(text = time, fontSize = 36.sp, color = Color.White)
+                Text(text = alarm.time, fontSize = 36.sp, color = Color.White)
                 Spacer(modifier = Modifier.width(5.dp))
                 if (!is24h)
-                    Text(text = if (isAM) "AM" else "PM", fontSize = 18.sp, color = Color.White)
+                    Text(text = if (true) "AM" else "PM", fontSize = 18.sp, color = Color.White)
             }
-            BuildWeekday(weekDay)
+            BuildWeekday(alarm.getListWeekday())
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 Switch(
-                    checked = isOn,
+                    checked = alarm.isOn,
                     onCheckedChange = onChange,
                     colors = SwitchDefaults.colors(
                         checkedTrackColor = Color(0xFFF0F757),
@@ -163,6 +180,6 @@ fun BuildWeekday(weekDay: List<Boolean>) {
 @Composable
 fun AlarmScreenPreview() {
     AlarmClockTheme {
-        AlarmScreen()
+        AlarmScreen(rememberNavController())
     }
 }

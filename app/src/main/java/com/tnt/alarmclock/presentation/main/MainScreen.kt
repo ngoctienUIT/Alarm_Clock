@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.alarmclock.R
+import com.tnt.alarmclock.core.utils.NavDestinations
 import com.tnt.alarmclock.presentation.alarm.AlarmScreen
 import com.tnt.alarmclock.presentation.clock.ClockScreen
 import com.tnt.alarmclock.presentation.stopwatch.StopwatchScreen
@@ -102,7 +103,15 @@ fun MainScreen(navController: NavController) {
         floatingActionButton = {
             FloatingActionButton(
                 shape = CircleShape,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    navController.navigate(NavDestinations.ADD_ALARM_SCREEN) {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) { saveState = true }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
             ) {
                 Icon(imageVector = Icons.Rounded.Add, contentDescription = "")
             }
@@ -115,7 +124,7 @@ fun MainScreen(navController: NavController) {
             state = pagerState,
         ) { index ->
             when (index) {
-                0 -> AlarmScreen()
+                0 -> AlarmScreen(navController)
                 1 -> ClockScreen()
                 2 -> TimerScreen()
                 3 -> StopwatchScreen()
