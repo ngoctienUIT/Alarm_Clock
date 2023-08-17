@@ -129,7 +129,7 @@ fun ItemAlarm(
                 if (!is24h)
                     Text(text = if (true) "AM" else "PM", fontSize = 18.sp, color = Color.White)
             }
-            BuildWeekday(alarm.getListWeekday())
+            BuildWeekday(alarm.once, alarm.getListWeekday())
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -153,27 +153,34 @@ fun ItemAlarm(
 }
 
 @Composable
-fun BuildWeekday(weekDay: List<Boolean>) {
-    if (weekDay.all { it })
-        Text(text = "Everyday", color = Color.White)
-    else
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            weekDay.forEachIndexed { index, item ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        modifier = Modifier
-                            .size(3.dp)
-                            .clip(CircleShape)
-                            .background(if (item) Color(0xFFF0F757) else Color.Transparent)
-                    )
-                    Text(
-                        text = listWeekday[index],
-                        color = if (item) Color(0xFFF0F757) else Color.White,
-                        fontSize = 14.sp
-                    )
+fun BuildWeekday(isOnce: Boolean, weekDay: List<Boolean>) {
+    if (isOnce) {
+        Text(text = "Một lần", color = Color.White)
+    } else {
+        if (weekDay.all { it })
+            Text(text = "Everyday", color = Color.White)
+        else
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                weekDay.forEachIndexed { index, item ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(
+                            modifier = Modifier
+                                .size(3.dp)
+                                .clip(CircleShape)
+                                .background(if (item) Color(0xFFF0F757) else Color.Transparent)
+                        )
+                        Text(
+                            text = listWeekday[index],
+                            color = if (item) Color(0xFFF0F757) else Color.White,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
             }
-        }
+    }
 }
 
 @Preview(showBackground = true)

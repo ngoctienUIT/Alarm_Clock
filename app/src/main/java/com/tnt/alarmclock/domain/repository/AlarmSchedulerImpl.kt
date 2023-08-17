@@ -16,7 +16,9 @@ class AlarmSchedulerImpl(private val context: Context) : AlarmScheduler {
 
     override fun schedule(alarm: Alarm) {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra("EXTRA_MESSAGE", alarm.title)
+            putExtra("ALARM_TITLE", alarm.title)
+            putExtra("ALARM_ID", alarm.id)
+            Log.d("id in schedule", alarm.id.toString())
         }
         val alarmTime = LocalDateTime.now().plusSeconds(10).atZone(ZoneId.systemDefault())
             .toEpochSecond() * 1000L

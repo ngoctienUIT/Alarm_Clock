@@ -11,18 +11,22 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+    @Singleton
     @Provides
     fun provideBeenAloneDatabase(@ApplicationContext context: Context) =
         Room.databaseBuilder(context, AlarmClockDatabase::class.java, "AlarmClockDatabase")
             .build()
 
+    @Singleton
     @Provides
     fun provideAlarmDao(alarmClockDatabase: AlarmClockDatabase) = alarmClockDatabase.alarmDao()
 
+    @Singleton
     @Provides
     fun provideInventoryRepository(alarmDao: AlarmDao): AlarmClockRepository =
         AlarmClockRepositoryImpl(alarmDao)

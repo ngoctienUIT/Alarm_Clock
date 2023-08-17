@@ -38,21 +38,7 @@ class AlarmViewModel @Inject constructor(private val alarmClockRepository: Alarm
                 } else {
                     alarmScheduler.cancel(alarm.toAlarm())
                 }
-                alarmClockRepository.upsertAlarm(
-                    AlarmEntity(
-                        alarm.title,
-                        alarm.time,
-                        switch,
-                        alarm.mon,
-                        alarm.tue,
-                        alarm.wed,
-                        alarm.thu,
-                        alarm.fri,
-                        alarm.sat,
-                        alarm.sun,
-                        alarm.id
-                    )
-                )
+                alarmClockRepository.upsertAlarm(alarm.changeState(switch))
             }
         }
     }
@@ -62,8 +48,9 @@ class AlarmViewModel @Inject constructor(private val alarmClockRepository: Alarm
 //            alarmClockRepository.upsertAlarm(
 //                AlarmEntity(
 //                    "Work",
-//                    "9:30",
+//                    "09:30",
 //                    isOn = false,
+//                    once = true,
 //                    mon = true,
 //                    tue = true,
 //                    wed = true,

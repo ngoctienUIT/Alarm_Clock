@@ -16,6 +16,9 @@ data class AlarmEntity(
     @ColumnInfo(name = "isOn")
     val isOn: Boolean,
 
+    @ColumnInfo(name = "once")
+    val once: Boolean,
+
     @ColumnInfo(name = "mon")
     val mon: Boolean,
 
@@ -43,5 +46,20 @@ data class AlarmEntity(
 ) {
     fun getListWeekday(): List<Boolean> = listOf(mon, tue, wed, thu, fri, sat, sun)
 
-    fun toAlarm(): Alarm = Alarm(title, time, isOn, mon, tue, wed, thu, fri, sat, sun, id)
+    fun toAlarm(): Alarm = Alarm(title, time, isOn, once, mon, tue, wed, thu, fri, sat, sun, id)
+
+    fun changeState(state: Boolean): AlarmEntity = AlarmEntity(
+        title,
+        time,
+        state,
+        once,
+        mon,
+        tue,
+        wed,
+        thu,
+        fri,
+        sat,
+        sun,
+        id
+    )
 }
